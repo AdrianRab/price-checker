@@ -1,4 +1,4 @@
-package com.pricechecker.tui.pricechecker;
+package com.pricechecker.tui;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
