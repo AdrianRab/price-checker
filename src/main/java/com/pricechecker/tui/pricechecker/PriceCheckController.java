@@ -27,7 +27,7 @@ public class PriceCheckController {
     @Scheduled(fixedRate = 3600000)
     private String runPriceCheck() throws IOException {
         URL tuiPrices = new URL("https://m.tui.pl/hotel-cards/configurators/all-offers");
-        String jsonInputForAllOffers = "{\"hotelCode\":\"ADB11932\",\"tripType\":\"WS\",\"adultsCount\":\"2\",\"childrenBirthdays\":[],\"airportCode\":\"WRO\",\"startDate\":\"2020-09-18\",\"durationFrom\":\"14\",\"durationTo\":\"14\",\"boardCode\":\"A\",\"pagination\":{\"pageNo\":0,\"pageSize\":6},\"sort\":{\"field\":\"PRICE\",\"order\":\"ASCENDING\"}}";
+        String jsonInputForAllOffers = "{\"hotelCode\":\"AYT42014\",\"tripType\":\"WS\",\"adultsCount\":\"2\",\"childrenBirthdays\":[],\"airportCode\":\"WRO\",\"startDate\":\"2020-06-06\",\"durationFrom\":\"14\",\"durationTo\":\"14\",\"boardCode\":null,\"pagination\":{\"pageNo\":0,\"totalPages\":7,\"pageSize\":6,\"totalResults\":42},\"sort\":{\"field\":\"PRICE\",\"order\":\"ASCENDING\"}}";
         StringBuilder pulledRoomData = dataPuller.connectAndPullData(jsonInputForAllOffers, tuiPrices);
         return dataPuller.checkPriceAndEnrichResponse(pulledRoomData);
     }

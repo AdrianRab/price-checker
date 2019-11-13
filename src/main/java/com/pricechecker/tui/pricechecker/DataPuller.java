@@ -15,7 +15,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class DataPuller {
-    private int initialPrice = 7372;
+    public static final String ROOM_CODE = "DZX2";
+    private int initialPrice = 7490;
     private EmailSender emailSender;
 
     @Autowired
@@ -27,6 +28,7 @@ public class DataPuller {
         response.append("\n");
         response.append(checkPriceAndSendNotification(response.toString()));
         response.append("\n");
+        response.append("Czas sprawdzania ceny: ");
         response.append(getCurrentDate());
         return response.toString();
     }
@@ -62,15 +64,15 @@ public class DataPuller {
         return connection;
     }
 
-    private String getCurrentDate() {
+    public static String getCurrentDate() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
         Date date = new Date(System.currentTimeMillis());
-        return "Czas sprawdzenia ceny " + formatter.format(date);
+        return formatter.format(date);
     }
 
     private String checkPriceAndSendNotification(String response) {
         try {
-            int newPrice = Integer.valueOf(response.substring(response.indexOf("DZM1") + 14, response.indexOf("DZM1") + 18));
+            int newPrice = Integer.valueOf(response.substring(response.indexOf(ROOM_CODE) + 14, response.indexOf("DZX2") + 18));
             return comparePrice(newPrice);
         } catch (NumberFormatException ex) {
             throw new IllegalStateException("Wrong number format, check response and parsing", ex);
@@ -81,18 +83,35 @@ public class DataPuller {
 
     private String comparePrice(int newPrice) throws MessagingException {
         if (initialPrice > newPrice) {
-            String eweMail = "ewe89@o2.pl";
-            String adiMail = "adi8912@poczta.fm";
-            String title = "Wycieczka TUI - zmiana ceny!";
-            String urlToOffer = "https://www.tui.pl/wypoczynek/turcja/turcja-egejska/richmond-ephesus-hotel-adb11932/OfferCodeWS/WROADB20200918222520200918202010021945L14ADB11932DZM1A";
-            String text = "Cena wycieczki się zmieniła z " + initialPrice + " na " + newPrice + ". <br> Wejdź na <a href=" + urlToOffer + ">Richmond Hotel TUI</a>, zrób screen i wyślij do TUI.";
-            emailSender.sendMail(eweMail, title, text, true);
-            emailSender.sendMail(adiMail, title, text, true);
+            prepareAndSendNotificationForLowerPrice(newPrice);
             initialPrice = newPrice;
             System.out.println(initialPrice);
             return "Cena jest niższa!!!";
+        } else if (initialPrice < newPrice) {
+            prepareAndSendNotificationForHigherPrice(newPrice);
+            System.out.println(newPrice);
+            return "Cena jest wyższa niż podczas zakupu.";
         }
         return "Cena się nie zmieniła";
+    }
+
+    private void prepareAndSendNotificationForHigherPrice(int newPrice) throws MessagingException {
+        String eweMail = "ewe89@o2.pl";
+        String adiMail = "adi8912@poczta.fm";
+        String title = "Wycieczka TUI - zmiana ceny!";
+        String text = "Cena wycieczki się zmieniła z " + initialPrice + " na " + newPrice + ". <br> Czyli wzrosła. Słabo.";
+        emailSender.sendMail(eweMail, title, text, true);
+        emailSender.sendMail(adiMail, title, text, true);
+    }
+
+    private void prepareAndSendNotificationForLowerPrice(int newPrice) throws MessagingException {
+        String eweMail = "ewe89@o2.pl";
+        String adiMail = "adi8912@poczta.fm";
+        String title = "Wycieczka TUI - zmiana ceny!";
+        String urlToOffer = "https://www.tui.pl/wypoczynek/turcja/riwiera-turecka/side-alegria-hotel-spa-ayt42014/OfferCodeWS/WROAYT20200606043020200606202006201640L14AYT42014DZX2AA02";
+        String text = "Cena wycieczki się zmieniła z " + initialPrice + " na " + newPrice + ". <br> Wejdź na <a href=" + urlToOffer + ">Alegria Hotel TUI</a>, zrób screen i wyślij do TUI.";
+        emailSender.sendMail(eweMail, title, text, true);
+        emailSender.sendMail(adiMail, title, text, true);
     }
 
     public int getInitialPrice() {
