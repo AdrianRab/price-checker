@@ -7,8 +7,8 @@ import java.util.Date;
 
 public class RoomDetails implements Serializable {
     private String airportName;
-    private Date departureDate;
-    private Date returnDate;
+    private String departureDate;
+    private String returnDate;
     private int duration;
     private String roomName;
     private String roomCode;
@@ -16,6 +16,7 @@ public class RoomDetails implements Serializable {
     private int discountPrice;
     private String offerCode;
     private Date receivedOn;
+    private String details;
 
     public String getAirportName() {
         return airportName;
@@ -25,21 +26,19 @@ public class RoomDetails implements Serializable {
         this.airportName = airportName;
     }
 
-    @JsonSerialize(using=DateSerializer.class)
-    public Date getDepartureDate() {
+    public String getDepartureDate() {
         return departureDate;
     }
 
-    public void setDepartureDate(Date departureDate) {
+    public void setDepartureDate(String departureDate) {
         this.departureDate = departureDate;
     }
 
-    @JsonSerialize(using=DateSerializer.class)
-    public Date getReturnDate() {
+    public String getReturnDate() {
         return returnDate;
     }
 
-    public void setReturnDate(Date returnDate) {
+    public void setReturnDate(String returnDate) {
         this.returnDate = returnDate;
     }
 
@@ -99,6 +98,33 @@ public class RoomDetails implements Serializable {
     public void setReceivedOn(Date receivedOn) {
         this.receivedOn = receivedOn;
     }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
+    }
+
+
+    @Override
+    public String toString() {
+        return "RoomDetails{" +
+                "airportName='" + airportName + '\'' +
+                ", departureDate='" + departureDate + '\'' +
+                ", returnDate='" + returnDate + '\'' +
+                ", duration=" + duration +
+                ", roomName='" + roomName + '\'' +
+                ", roomCode='" + roomCode + '\'' +
+                ", price=" + price +
+                ", discountPrice=" + discountPrice +
+                ", offerCode='" + offerCode + '\'' +
+                ", receivedOn=" + receivedOn +
+                ", details='" + details + '\'' +
+                '}';
+    }
+
 }
 
 //all offers

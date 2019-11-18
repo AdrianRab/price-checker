@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/price")
+@RequestMapping
 public class PriceCheckController {
 
     private DataPuller dataPuller;
@@ -19,13 +19,18 @@ public class PriceCheckController {
         this.dataPuller = dataPuller;
     }
 
-    @GetMapping(produces = "application/json")
-    public String getHotelPrice() throws IOException {
+    @GetMapping
+    public String pingApplication(){
+        return "Application is up and running";
+    }
+
+    @GetMapping(path="/price", produces = "application/json")
+    public RoomDetails getHotelPrice() throws IOException {
         return runPriceCheck();
     }
 
     @Scheduled(fixedRate = 3600000)
-    private String runPriceCheck() throws IOException {
+    private RoomDetails runPriceCheck() throws IOException {
         URL tuiPrices = new URL("https://m.tui.pl/hotel-cards/configurators/all-offers");
         String jsonInputForAllOffers = "{\"hotelCode\":\"AYT42014\",\"tripType\":\"WS\",\"adultsCount\":\"2\",\"childrenBirthdays\":[],\"airportCode\":\"WRO\",\"startDate\":\"2020-06-06\",\"durationFrom\":\"14\",\"durationTo\":\"14\",\"boardCode\":null,\"pagination\":{\"pageNo\":0,\"totalPages\":7,\"pageSize\":6,\"totalResults\":42},\"sort\":{\"field\":\"PRICE\",\"order\":\"ASCENDING\"}}";
         StringBuilder pulledRoomData = dataPuller.connectAndPullData(jsonInputForAllOffers, tuiPrices);

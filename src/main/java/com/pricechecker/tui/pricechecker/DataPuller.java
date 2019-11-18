@@ -24,13 +24,8 @@ public class DataPuller {
         this.emailSender = emailSender;
     }
 
-    String checkPriceAndEnrichResponse(StringBuilder response) {
-        response.append("\n");
-        response.append(checkPriceAndSendNotification(response.toString()));
-        response.append("\n");
-        response.append("Czas sprawdzania ceny: ");
-        response.append(getCurrentDate());
-        return response.toString();
+    RoomDetails checkPriceAndEnrichResponse(StringBuilder response) {
+        return RoomDetailsParser.parse(response.toString(), checkPriceAndSendNotification(response.toString()));
     }
 
     StringBuilder connectAndPullData(String jsonInputString, URL tuiPrices) throws IOException {
@@ -72,7 +67,7 @@ public class DataPuller {
 
     private String checkPriceAndSendNotification(String response) {
         try {
-            int newPrice = Integer.valueOf(response.substring(response.indexOf(ROOM_CODE) + 14, response.indexOf("DZX2") + 18));
+            int newPrice = Integer.valueOf(response.substring(response.indexOf(ROOM_CODE) + 14, response.indexOf(ROOM_CODE) + 18));
             return comparePrice(newPrice);
         } catch (NumberFormatException ex) {
             throw new IllegalStateException("Wrong number format, check response and parsing", ex);
@@ -86,13 +81,13 @@ public class DataPuller {
             prepareAndSendNotificationForLowerPrice(newPrice);
             initialPrice = newPrice;
             System.out.println(initialPrice);
-            return "Cena jest niższa!!!";
+            return "Cena jest niższa!!! Jedyne " + newPrice + " zł";
         } else if (initialPrice < newPrice) {
             prepareAndSendNotificationForHigherPrice(newPrice);
             System.out.println(newPrice);
-            return "Cena jest wyższa niż podczas zakupu.";
+            return "Cena jest wyższa niż podczas zakupu: " + newPrice + " zł";
         }
-        return "Cena się nie zmieniła";
+        return "Cena się nie zmieniła: " + initialPrice + " zł";
     }
 
     private void prepareAndSendNotificationForHigherPrice(int newPrice) throws MessagingException {
