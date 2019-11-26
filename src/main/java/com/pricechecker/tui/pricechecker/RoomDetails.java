@@ -4,8 +4,28 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 import java.io.Serializable;
 import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Entity
+@Table(name="ROOM_DETAILS")
 public class RoomDetails implements Serializable {
+
+    @Getter @Setter
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
     private String airportName;
     private String departureDate;
     private String returnDate;
@@ -17,6 +37,15 @@ public class RoomDetails implements Serializable {
     private String offerCode;
     private Date receivedOn;
     private String details;
+    private int originalPrice;
+
+    public int getOriginalPrice() {
+        return originalPrice;
+    }
+
+    public void setOriginalPrice(int originalPrice) {
+        this.originalPrice = originalPrice;
+    }
 
     public String getAirportName() {
         return airportName;
@@ -90,7 +119,7 @@ public class RoomDetails implements Serializable {
         this.offerCode = offerCode;
     }
 
-    @JsonSerialize(using= DateSerializer.class)
+    @JsonSerialize(using = DateSerializer.class)
     public Date getReceivedOn() {
         return receivedOn;
     }
@@ -106,7 +135,6 @@ public class RoomDetails implements Serializable {
     public void setDetails(String details) {
         this.details = details;
     }
-
 
     @Override
     public String toString() {
@@ -124,8 +152,4 @@ public class RoomDetails implements Serializable {
                 ", details='" + details + '\'' +
                 '}';
     }
-
 }
-
-//all offers
-//{"offers":[{"airportName":"Wrocław","departureDate":"2020-09-18","departureHours":"22:25","returnDate":"2020-10-02","accommodationDate":"2020-09-18","duration":14,"boardName":"All Inclusive","roomName":"Pokój 2-osobowy","roomCode":"DZX1","price":6980,"discountPrice":6980,"offerCode":"WROADB20200918222520200918202010021945L14ADB11932DZX1AA02"},{"airportName":"Wrocław","departureDate":"2020-09-18","departureHours":"22:25","returnDate":"2020-10-02","accommodationDate":"2020-09-18","duration":14,"boardName":"All Inclusive","roomName":"Pokój 2-osobowy z widokiem na morze","roomCode":"DZM1","price":7372,"discountPrice":7372,"offerCode":"WROADB20200918222520200918202010021945L14ADB11932DZM1AA02"}],"pagination":{"pageNo":0,"totalPages":1,"pageSize":2,"totalResults":2}}

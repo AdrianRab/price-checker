@@ -27,6 +27,7 @@ public class RoomDetailsParser {
         roomDetails.setDetails(details);
         roomDetails.setDiscountPrice(discountPrice);
         roomDetails.setOfferCode(offertCode);
+        roomDetails.setOriginalPrice(DataPuller.INITIAL_PRICE);
 
         System.out.println(roomDetails.toString());
         return roomDetails;

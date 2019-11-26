@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataPuller {
     public static final String ROOM_CODE = "DZX2";
-    private int initialPrice = 7490;
+    public static final int INITIAL_PRICE = 7490;
     private EmailSender emailSender;
 
     @Autowired
@@ -77,24 +77,23 @@ public class DataPuller {
     }
 
     private String comparePrice(int newPrice) throws MessagingException {
-        if (initialPrice > newPrice) {
+        if (INITIAL_PRICE > newPrice) {
             prepareAndSendNotificationForLowerPrice(newPrice);
-            initialPrice = newPrice;
-            System.out.println(initialPrice);
+            System.out.println(INITIAL_PRICE);
             return "Cena jest niższa!!! Jedyne " + newPrice + " zł";
-        } else if (initialPrice < newPrice) {
+        } else if (INITIAL_PRICE < newPrice) {
             prepareAndSendNotificationForHigherPrice(newPrice);
             System.out.println(newPrice);
             return "Cena jest wyższa niż podczas zakupu: " + newPrice + " zł";
         }
-        return "Cena się nie zmieniła: " + initialPrice + " zł";
+        return "Cena się nie zmieniła: " + INITIAL_PRICE + " zł";
     }
 
     private void prepareAndSendNotificationForHigherPrice(int newPrice) throws MessagingException {
         String eweMail = "ewe89@o2.pl";
         String adiMail = "adi8912@poczta.fm";
         String title = "Wycieczka TUI - zmiana ceny!";
-        String text = "Cena wycieczki się zmieniła z " + initialPrice + " na " + newPrice + ". <br> Czyli wzrosła. Słabo.";
+        String text = "Cena wycieczki się zmieniła z " + INITIAL_PRICE + " na " + newPrice + ". <br> Czyli wzrosła. Słabo.";
         emailSender.sendMail(eweMail, title, text, true);
         emailSender.sendMail(adiMail, title, text, true);
     }
@@ -104,16 +103,8 @@ public class DataPuller {
         String adiMail = "adi8912@poczta.fm";
         String title = "Wycieczka TUI - zmiana ceny!";
         String urlToOffer = "https://www.tui.pl/wypoczynek/turcja/riwiera-turecka/side-alegria-hotel-spa-ayt42014/OfferCodeWS/WROAYT20200606043020200606202006201640L14AYT42014DZX2AA02";
-        String text = "Cena wycieczki się zmieniła z " + initialPrice + " na " + newPrice + ". <br> Wejdź na <a href=" + urlToOffer + ">Alegria Hotel TUI</a>, zrób screen i wyślij do TUI.";
+        String text = "Cena wycieczki się zmieniła z " + INITIAL_PRICE + " na " + newPrice + ". <br> Wejdź na <a href=" + urlToOffer + ">Alegria Hotel TUI</a>, zrób screen i wyślij do TUI.";
         emailSender.sendMail(eweMail, title, text, true);
         emailSender.sendMail(adiMail, title, text, true);
-    }
-
-    public int getInitialPrice() {
-        return initialPrice;
-    }
-
-    public void setInitialPrice(int initialPrice) {
-        this.initialPrice = initialPrice;
     }
 }
