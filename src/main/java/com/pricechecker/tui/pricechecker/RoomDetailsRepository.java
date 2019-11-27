@@ -1,4 +1,4 @@
-package com.pricechecker.tui.pricechecker.repository;
+package com.pricechecker.tui.pricechecker;
 
 import com.pricechecker.tui.pricechecker.RoomDetails;
 import org.springframework.data.repository.CrudRepository;

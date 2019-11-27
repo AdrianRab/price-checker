@@ -3,11 +3,17 @@ package com.pricechecker.tui.pricechecker;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,105 +25,40 @@ import lombok.Setter;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name="ROOM_DETAILS")
+@Table(name="room_details")
 public class RoomDetails implements Serializable {
 
     @Getter @Setter
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
+    @Getter @Setter
     private String airportName;
+    @Getter @Setter
     private String departureDate;
+    @Getter @Setter
     private String returnDate;
+    @Getter @Setter
     private int duration;
+    @Getter @Setter
     private String roomName;
+    @Getter @Setter
     private String roomCode;
+    @Getter @Setter
     private int price;
+    @Getter @Setter
     private int discountPrice;
+    @Getter @Setter
     private String offerCode;
     private Date receivedOn;
+    @Getter @Setter
     private String details;
+    @Getter @Setter
     private int originalPrice;
-
-    public int getOriginalPrice() {
-        return originalPrice;
-    }
-
-    public void setOriginalPrice(int originalPrice) {
-        this.originalPrice = originalPrice;
-    }
-
-    public String getAirportName() {
-        return airportName;
-    }
-
-    public void setAirportName(String airportName) {
-        this.airportName = airportName;
-    }
-
-    public String getDepartureDate() {
-        return departureDate;
-    }
-
-    public void setDepartureDate(String departureDate) {
-        this.departureDate = departureDate;
-    }
-
-    public String getReturnDate() {
-        return returnDate;
-    }
-
-    public void setReturnDate(String returnDate) {
-        this.returnDate = returnDate;
-    }
-
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    public String getRoomName() {
-        return roomName;
-    }
-
-    public void setRoomName(String roomName) {
-        this.roomName = roomName;
-    }
-
-    public String getRoomCode() {
-        return roomCode;
-    }
-
-    public void setRoomCode(String roomCode) {
-        this.roomCode = roomCode;
-    }
-
-    public int getPrice() {
-        return price;
-    }
-
-    public void setPrice(int price) {
-        this.price = price;
-    }
-
-    public int getDiscountPrice() {
-        return discountPrice;
-    }
-
-    public void setDiscountPrice(int discountPrice) {
-        this.discountPrice = discountPrice;
-    }
-
-    public String getOfferCode() {
-        return offerCode;
-    }
-
-    public void setOfferCode(String offerCode) {
-        this.offerCode = offerCode;
-    }
+    @Getter @Setter
+    @ElementCollection
+    @CollectionTable(name="emails", joinColumns = @JoinColumn(name="id"))
+    private List<String> emails = new ArrayList<>();
 
     @JsonSerialize(using = DateSerializer.class)
     public Date getReceivedOn() {
@@ -126,14 +67,6 @@ public class RoomDetails implements Serializable {
 
     public void setReceivedOn(Date receivedOn) {
         this.receivedOn = receivedOn;
-    }
-
-    public String getDetails() {
-        return details;
-    }
-
-    public void setDetails(String details) {
-        this.details = details;
     }
 
     @Override
