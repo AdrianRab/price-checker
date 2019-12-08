@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataPuller {
     public static final String ROOM_CODE = "DZX2";
-    private int initialPrice = 7490;
+    private int initialPrice = 7322;
     private EmailSender emailSender;
 
     @Autowired
