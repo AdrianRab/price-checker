@@ -1,5 +1,6 @@
 package com.pricechecker.tui.pricechecker;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataPuller {
     public static final String ROOM_CODE = "DZX2";
-    public static final int INITIAL_PRICE = 7490;
+    public static final int INITIAL_PRICE = 7322;
     private EmailSender emailSender;
 
     @Autowired
@@ -24,8 +25,9 @@ public class DataPuller {
         this.emailSender = emailSender;
     }
 
-    RoomDetails checkPriceAndEnrichResponse(StringBuilder response) {
-        return RoomDetailsParser.parse(response.toString(), checkPriceAndSendNotification(response.toString()));
+    RoomDetails checkPriceAndEnrichResponse(StringBuilder response) throws JsonProcessingException {
+        //todo podpiac baze posgres i h2
+        return RoomDetailsParser.parseJson(response.toString(), checkPriceAndSendNotification(response.toString()));
     }
 
     StringBuilder connectAndPullData(String jsonInputString, URL tuiPrices) throws IOException {
@@ -67,7 +69,7 @@ public class DataPuller {
 
     private String checkPriceAndSendNotification(String response) {
         try {
-            int newPrice = Integer.valueOf(response.substring(response.indexOf(ROOM_CODE) + 14, response.indexOf(ROOM_CODE) + 18));
+            int newPrice = Integer.parseInt(response.substring(response.indexOf(ROOM_CODE) + 14, response.indexOf(ROOM_CODE) + 18));
             return comparePrice(newPrice);
         } catch (NumberFormatException ex) {
             throw new IllegalStateException("Wrong number format, check response and parsing", ex);

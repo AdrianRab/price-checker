@@ -1,36 +1,54 @@
 package com.pricechecker.tui.pricechecker;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RoomDetailsParser {
 
-    public static RoomDetails parse(String response, String details) {
-        RoomDetails roomDetails = new RoomDetails();
-        int roomPrice = Integer.valueOf(response.substring(response.indexOf(DataPuller.ROOM_CODE) + 14, response.indexOf(DataPuller.ROOM_CODE) + 18));
-        int duration = Integer.valueOf(response.substring(response.indexOf(DataPuller.ROOM_CODE) - 72, response.indexOf(DataPuller.ROOM_CODE) - 70));
-        int discountPrice = Integer.valueOf(response.substring(response.indexOf(DataPuller.ROOM_CODE) + 35, response.indexOf(DataPuller.ROOM_CODE) + 39));
-        String roomName = response.substring(response.indexOf(DataPuller.ROOM_CODE) - 29, response.indexOf(DataPuller.ROOM_CODE) - 14);
-        String returnDate = response.substring(response.indexOf(DataPuller.ROOM_CODE) - 128, response.indexOf(DataPuller.ROOM_CODE) - 118);
-        String departureTime = response.substring(response.indexOf(DataPuller.ROOM_CODE) - 150, response.indexOf(DataPuller.ROOM_CODE) - 144);
-        String departureDate = response.substring(response.indexOf(DataPuller.ROOM_CODE) - 179, response.indexOf(DataPuller.ROOM_CODE) - 169);
-        String airport = response.substring(response.indexOf(DataPuller.ROOM_CODE) - 205, response.indexOf(DataPuller.ROOM_CODE) - 198);
-        String offertCode = response.substring(response.indexOf(DataPuller.ROOM_CODE) + 55, response.indexOf(DataPuller.ROOM_CODE) + 110);
+    public static RoomDetails parseJson(String response, String details) throws JsonProcessingException {
+        List<ResponseDetails> myRoomDetails = parseResponseAndGetOfferDetails(response);
+        return getRoomDetails(details, myRoomDetails);
+    }
 
-        roomDetails.setPrice(roomPrice);
-        roomDetails.setDuration(duration);
-        roomDetails.setRoomCode(DataPuller.ROOM_CODE);
-        roomDetails.setRoomName(roomName);
-        roomDetails.setReceivedOn(new Date(System.currentTimeMillis()));
-        roomDetails.setReturnDate(returnDate);
-        roomDetails.setDepartureDate(departureDate);
-        roomDetails.setAirportName(airport);
-        roomDetails.setDetails(details);
-        roomDetails.setDiscountPrice(discountPrice);
-        roomDetails.setOfferCode(offertCode);
-        roomDetails.setOriginalPrice(DataPuller.INITIAL_PRICE);
+    private static RoomDetails getRoomDetails(String details, List<ResponseDetails> myRoomDetails) {
+        if (myRoomDetails.isEmpty()) {
+            throw new IllegalStateException("Your room" + DataPuller.ROOM_CODE + "is not available.");
+        }
+        return RoomDetails.RoomDetailsBuilder.aRoomDetails()
+                .withDetails(details)
+                .withRoomCode(DataPuller.ROOM_CODE)
+                .withAirportName(myRoomDetails.get(0).getAirportName())
+                .withDepartureDate(myRoomDetails.get(0).getDepartureDate())
+                .withDiscountPrice(myRoomDetails.get(0).getDiscountPrice())
+                .withDuration(myRoomDetails.get(0).getDuration())
+                .withRoomName(myRoomDetails.get(0).getRoomName())
+                .withOfferCode(myRoomDetails.get(0).getOfferCode())
+                .withReturnDate(myRoomDetails.get(0).getReturnDate())
+                .withOriginalPrice(DataPuller.INITIAL_PRICE)
+                .withReceivedOn(new Date(System.currentTimeMillis()))
+                .withPrice(myRoomDetails.get(0).getPrice())
+                .build();
+    }
 
-        System.out.println(roomDetails.toString());
-        return roomDetails;
+    private static List<ResponseDetails> parseResponseAndGetOfferDetails(String response) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode node = objectMapper.readTree(response);
+        JsonNode offers = node.get("offers");
+        List<ResponseDetails> responseDetailsList = new ArrayList<>();
+        for (JsonNode offer : offers) {
+            ResponseDetails responseDetails = objectMapper.treeToValue(offer, ResponseDetails.class);
+            responseDetailsList.add(responseDetails);
+        }
+
+        return responseDetailsList
+                .stream()
+                .filter(respDetails -> respDetails.getRoomCode().equals(DataPuller.ROOM_CODE))
+                .collect(Collectors.toList());
     }
 
 }
