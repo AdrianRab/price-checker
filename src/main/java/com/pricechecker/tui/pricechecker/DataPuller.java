@@ -10,6 +10,8 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,17 +19,37 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataPuller {
     public static final String ROOM_CODE = "DZX2";
-    public static final int INITIAL_PRICE = 7322;
+    public static int INITIAL_PRICE = 7322;
     private EmailSender emailSender;
+    private RoomDetailsService roomDetailsService;
 
     @Autowired
-    public DataPuller(EmailSender emailSender) {
+    public DataPuller(EmailSender emailSender, RoomDetailsService roomDetailsService) {
         this.emailSender = emailSender;
+        this.roomDetailsService = roomDetailsService;
     }
 
+
     RoomDetails checkPriceAndEnrichResponse(StringBuilder response) throws JsonProcessingException {
-        //todo podpiac baze posgres i h2
-        return RoomDetailsParser.parseJson(response.toString(), checkPriceAndSendNotification(response.toString()));
+        RoomDetails roomDetails = RoomDetailsParser.parseJson(response.toString(), checkPriceAndSendNotification(response.toString()));
+        saveToDbIfNoEntry(roomDetails);
+        return roomDetails;
+    }
+
+    private void saveToDbIfNoEntry(RoomDetails roomDetails) {
+        List<Integer> allPrices = getAllSavedPrices();
+
+        if (!allPrices.contains(roomDetails.getPrice())) {
+            roomDetailsService.save(roomDetails);
+        }
+    }
+
+    private List<Integer> getAllSavedPrices() {
+        return roomDetailsService.getAllRoomDetails()
+                .stream()
+                .map(RoomDetails::getPrice)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     StringBuilder connectAndPullData(String jsonInputString, URL tuiPrices) throws IOException {
@@ -79,11 +101,15 @@ public class DataPuller {
     }
 
     private String comparePrice(int newPrice) throws MessagingException {
-        if (INITIAL_PRICE > newPrice) {
+        List<Integer> prices = getAllSavedPrices();
+        if (!prices.isEmpty()) {
+            INITIAL_PRICE = prices.get(0);
+        }
+        if (INITIAL_PRICE > newPrice && !prices.contains(newPrice)) {
             prepareAndSendNotificationForLowerPrice(newPrice);
             System.out.println(INITIAL_PRICE);
             return "Cena jest niższa!!! Jedyne " + newPrice + " zł";
-        } else if (INITIAL_PRICE < newPrice) {
+        } else if (INITIAL_PRICE < newPrice && !prices.contains(newPrice)) {
             prepareAndSendNotificationForHigherPrice(newPrice);
             System.out.println(newPrice);
             return "Cena jest wyższa niż podczas zakupu: " + newPrice + " zł";
