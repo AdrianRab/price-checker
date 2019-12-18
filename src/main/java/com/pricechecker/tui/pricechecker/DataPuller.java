@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataPuller {
     public static final String ROOM_CODE = "DZX2";
-    public static int INITIAL_PRICE = 7322;
+    static int INITIAL_PRICE = 7322;
     private EmailSender emailSender;
     private RoomDetailsService roomDetailsService;
 
@@ -82,7 +82,7 @@ public class DataPuller {
         return connection;
     }
 
-    private String checkPriceAndSendNotification(RoomDetails roomDetails) throws MessagingException {
+    private void checkPriceAndSendNotification(RoomDetails roomDetails) throws MessagingException {
         List<Integer> prices = getAllSavedPricesForRoom(roomDetails.getRoomCode());
         if (!prices.isEmpty()) {
             INITIAL_PRICE = prices.get(0);
@@ -90,18 +90,18 @@ public class DataPuller {
         if (INITIAL_PRICE > newPrice && !prices.contains(newPrice)) {
             prepareAndSendNotificationForLowerPrice(newPrice);
             System.out.println(INITIAL_PRICE);
-            return "Cena jest niższa!!! Jedyne " + newPrice + " zł";
+            roomDetails.setDetails("Cena jest niższa (stara" + INITIAL_PRICE + ")!!! Jedyne " + newPrice + " zł");
         } else if (INITIAL_PRICE < newPrice && !prices.contains(newPrice)) {
             prepareAndSendNotificationForHigherPrice(newPrice);
             System.out.println(newPrice);
-            return "Cena jest wyższa niż podczas zakupu: " + newPrice + " zł";
+            roomDetails.setDetails("Cena jest wyższa (stara" + INITIAL_PRICE + ") niż podczas zakupu: " + newPrice + " zł");
         }
-        return "Cena się nie zmieniła: " + INITIAL_PRICE + " zł";
+        roomDetails.setDetails("Cena się nie zmieniła: " + INITIAL_PRICE + " zł");
     }
 
     private void prepareAndSendNotificationForHigherPrice(RoomDetails roomDetails) throws MessagingException {
-        String eweMail = "ewe89@o2.pl";
-        String adiMail = "adi8912@poczta.fm";
+        String eweMail = roomDetails.getEmails().size() == 2 ? roomDetails.getEmails().get(0) : "ewe89@o2.pl";
+        String adiMail = roomDetails.getEmails().size() == 2 ? roomDetails.getEmails().get(1) : "adi8912@poczta.fm";
         String title = "Wycieczka TUI - cena wzrosła!";
         String text = "Cena wycieczki się zmieniła z " + INITIAL_PRICE + " na " + roomDetails.getPrice() + ". <br> Czyli wzrosła. Słabo.";
         emailSender.sendMail(eweMail, title, text, true);
@@ -113,9 +113,7 @@ public class DataPuller {
         String adiMail = roomDetails.getEmails().size() == 2 ? roomDetails.getEmails().get(1) : "adi8912@poczta.fm";
         String title = "Wycieczka TUI - cena spadła!";
         String urlToOffer = "https://www.tui.pl/wypoczynek/turcja/riwiera-turecka/side-alegria-hotel-spa-ayt42014/OfferCodeWS/WROAYT20200606043020200606202006201640L14AYT42014DZX2AA02";
-        String text = "Cena wycieczki się zmieniła z " + INITIAL_PRICE + " na " + roomDetails.getPrice() + ". <br> Wejdź na <a href=" + urlToOffer + ">Alegria Hotel TUI</a>, kliknij kup" +
-                " online (bez ubezpiecznia)," +
-                "wygeneruj pdf i wyślij do TUI.";
+        String text = "Cena wycieczki się zmieniła z " + INITIAL_PRICE + " na " + roomDetails.getPrice() + ". <br> Wejdź na <a href=" + urlToOffer + ">Alegria Hotel TUI</a>, zrób screen i wyślij do TUI.";
         emailSender.sendMail(eweMail, title, text, true);
         emailSender.sendMail(adiMail, title, text, true);
     }
