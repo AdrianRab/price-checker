@@ -2,6 +2,7 @@ package com.pricechecker.tui.pricechecker;
 
 import java.io.IOException;
 import java.net.URL;
+import javax.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,12 +26,12 @@ public class PriceCheckController {
     }
 
     @GetMapping(path="/price", produces = "application/json")
-    public RoomDetails getHotelPrice() throws IOException {
+    public RoomDetails getHotelPrice() throws IOException, MessagingException {
         return runPriceCheck();
     }
 
     @Scheduled(fixedRate = 3600000)
-    private RoomDetails runPriceCheck() throws IOException {
+    private RoomDetails runPriceCheck() throws IOException, MessagingException {
         URL tuiPrices = new URL("https://m.tui.pl/hotel-cards/configurators/all-offers");
         String jsonInputForAllOffers = "{\"hotelCode\":\"AYT42014\",\"tripType\":\"WS\",\"adultsCount\":\"2\",\"childrenBirthdays\":[],\"airportCode\":\"WRO\",\"startDate\":\"2020-06-06\",\"durationFrom\":\"14\",\"durationTo\":\"14\",\"boardCode\":null,\"pagination\":{\"pageNo\":0,\"totalPages\":7,\"pageSize\":6,\"totalResults\":42},\"sort\":{\"field\":\"PRICE\",\"order\":\"ASCENDING\"}}";
         StringBuilder pulledRoomData = dataPuller.connectAndPullData(jsonInputForAllOffers, tuiPrices);
