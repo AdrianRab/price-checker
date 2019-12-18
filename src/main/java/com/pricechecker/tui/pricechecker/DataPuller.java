@@ -84,17 +84,20 @@ public class DataPuller {
 
     private void checkPriceAndSendNotification(RoomDetails roomDetails) throws MessagingException {
         List<Integer> prices = getAllSavedPricesForRoom(roomDetails.getRoomCode());
+        int newPrice = roomDetails.getPrice();
         if (!prices.isEmpty()) {
             INITIAL_PRICE = prices.get(0);
         }
         if (INITIAL_PRICE > newPrice && !prices.contains(newPrice)) {
-            prepareAndSendNotificationForLowerPrice(newPrice);
+            prepareAndSendNotificationForLowerPrice(roomDetails);
             System.out.println(INITIAL_PRICE);
-            roomDetails.setDetails("Cena jest niższa (stara" + INITIAL_PRICE + ")!!! Jedyne " + newPrice + " zł");
+            roomDetails.setDetails("Cena jest niższa (stara " + INITIAL_PRICE + ")!!! Jedyne " + newPrice + " zł");
+            return;
         } else if (INITIAL_PRICE < newPrice && !prices.contains(newPrice)) {
-            prepareAndSendNotificationForHigherPrice(newPrice);
+            prepareAndSendNotificationForHigherPrice(roomDetails);
             System.out.println(newPrice);
-            roomDetails.setDetails("Cena jest wyższa (stara" + INITIAL_PRICE + ") niż podczas zakupu: " + newPrice + " zł");
+            roomDetails.setDetails("Cena jest wyższa (stara " + INITIAL_PRICE + ") niż podczas zakupu: " + newPrice + " zł");
+            return;
         }
         roomDetails.setDetails("Cena się nie zmieniła: " + INITIAL_PRICE + " zł");
     }

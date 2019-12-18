@@ -20,19 +20,19 @@ public class RoomDetailsParser {
         if (myRoomDetails.isEmpty()) {
             throw new IllegalStateException("Your room" + DataPuller.ROOM_CODE + "is not available.");
         }
-        return RoomDetails.RoomDetailsBuilder.aRoomDetails()
-                .withRoomCode(DataPuller.ROOM_CODE)
-                .withAirportName(myRoomDetails.get(0).getAirportName())
-                .withDepartureDate(myRoomDetails.get(0).getDepartureDate())
-                .withDiscountPrice(myRoomDetails.get(0).getDiscountPrice())
-                .withDuration(myRoomDetails.get(0).getDuration())
-                .withRoomName(myRoomDetails.get(0).getRoomName())
-                .withOfferCode(myRoomDetails.get(0).getOfferCode())
-                .withReturnDate(myRoomDetails.get(0).getReturnDate())
-                .withOriginalPrice(DataPuller.INITIAL_PRICE)
-                .withReceivedOn(new Date(System.currentTimeMillis()))
-                .withPrice(myRoomDetails.get(0).getPrice())
-                .withEmails(Arrays.asList("ewe89@o2.pl", "adi8912@poczta.fm"))
+        return RoomDetails.builder()
+                .roomCode(DataPuller.ROOM_CODE)
+                .airportName(myRoomDetails.get(0).getAirportName())
+                .departureDate(myRoomDetails.get(0).getDepartureDate())
+                .discountPrice(myRoomDetails.get(0).getDiscountPrice())
+                .duration(myRoomDetails.get(0).getDuration())
+                .roomName(myRoomDetails.get(0).getRoomName())
+                .offerCode(myRoomDetails.get(0).getOfferCode())
+                .returnDate(myRoomDetails.get(0).getReturnDate())
+                .originalPrice(DataPuller.INITIAL_PRICE)
+                .receivedOn(new Date(System.currentTimeMillis()))
+                .price(myRoomDetails.get(0).getPrice())
+                .emails(Arrays.asList("ewe89@o2.pl", "adi8912@poczta.fm"))
                 .build();
     }
 

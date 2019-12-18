@@ -1,13 +1,10 @@
 package com.pricechecker.tui.pricechecker;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.DateSerializer;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.CollectionTable;
-import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,17 +13,16 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder(toBuilder = true)
 @Entity
-@Table(name="room_details")
+@Table(name = "room_details")
 public class RoomDetails implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,8 +40,6 @@ public class RoomDetails implements Serializable {
     private String details;
     private int originalPrice;
     @ElementCollection
-    @CollectionTable(name="emails", joinColumns = @JoinColumn(name="id"))
+    @CollectionTable(name = "emails", joinColumns = @JoinColumn(name = "id"))
     private List<String> emails = new ArrayList<>();
-
-    }
 }
