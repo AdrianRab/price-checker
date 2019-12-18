@@ -25,4 +25,8 @@ public class RoomDetailsService {
         return (List<RoomDetails>) roomDetailsRepository.findAll();
     }
 
+    public List<RoomDetails> getAllRoomDetailsByRoomCode (String roomCode){
+        return roomDetailsRepository.findAllByRoomCode(roomCode);
+    }
+
 }

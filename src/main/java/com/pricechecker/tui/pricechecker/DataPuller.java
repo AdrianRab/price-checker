@@ -8,8 +8,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.mail.MessagingException;
@@ -30,22 +28,23 @@ public class DataPuller {
     }
 
 
-    RoomDetails checkPriceAndEnrichResponse(StringBuilder response) throws JsonProcessingException {
-        RoomDetails roomDetails = RoomDetailsParser.parseJson(response.toString(), checkPriceAndSendNotification(response.toString()));
+    RoomDetails checkPriceAndEnrichResponse(StringBuilder response) throws JsonProcessingException, MessagingException {
+        RoomDetails roomDetails = RoomDetailsParser.parseJson(response.toString());
         saveToDbIfNoEntry(roomDetails);
+        checkPriceAndSendNotification(roomDetails);
         return roomDetails;
     }
 
     private void saveToDbIfNoEntry(RoomDetails roomDetails) {
-        List<Integer> allPrices = getAllSavedPrices();
+        List<Integer> allPrices = getAllSavedPricesForRoom(roomDetails.getRoomCode());
 
         if (!allPrices.contains(roomDetails.getPrice())) {
             roomDetailsService.save(roomDetails);
         }
     }
 
-    private List<Integer> getAllSavedPrices() {
-        return roomDetailsService.getAllRoomDetails()
+    private List<Integer> getAllSavedPricesForRoom(String roomCode) {
+        return roomDetailsService.getAllRoomDetailsByRoomCode(roomCode)
                 .stream()
                 .map(RoomDetails::getPrice)
                 .sorted()
@@ -83,25 +82,8 @@ public class DataPuller {
         return connection;
     }
 
-    public static String getCurrentDate() {
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
-        Date date = new Date(System.currentTimeMillis());
-        return formatter.format(date);
-    }
-
-    private String checkPriceAndSendNotification(String response) {
-        try {
-            int newPrice = Integer.parseInt(response.substring(response.indexOf(ROOM_CODE) + 14, response.indexOf(ROOM_CODE) + 18));
-            return comparePrice(newPrice);
-        } catch (NumberFormatException ex) {
-            throw new IllegalStateException("Wrong number format, check response and parsing", ex);
-        } catch (MessagingException ex) {
-            throw new IllegalStateException("Something is wrong with message you try to send", ex);
-        }
-    }
-
-    private String comparePrice(int newPrice) throws MessagingException {
-        List<Integer> prices = getAllSavedPrices();
+    private String checkPriceAndSendNotification(RoomDetails roomDetails) throws MessagingException {
+        List<Integer> prices = getAllSavedPricesForRoom(roomDetails.getRoomCode());
         if (!prices.isEmpty()) {
             INITIAL_PRICE = prices.get(0);
         }
@@ -117,21 +99,23 @@ public class DataPuller {
         return "Cena się nie zmieniła: " + INITIAL_PRICE + " zł";
     }
 
-    private void prepareAndSendNotificationForHigherPrice(int newPrice) throws MessagingException {
+    private void prepareAndSendNotificationForHigherPrice(RoomDetails roomDetails) throws MessagingException {
         String eweMail = "ewe89@o2.pl";
         String adiMail = "adi8912@poczta.fm";
-        String title = "Wycieczka TUI - zmiana ceny!";
-        String text = "Cena wycieczki się zmieniła z " + INITIAL_PRICE + " na " + newPrice + ". <br> Czyli wzrosła. Słabo.";
+        String title = "Wycieczka TUI - cena wzrosła!";
+        String text = "Cena wycieczki się zmieniła z " + INITIAL_PRICE + " na " + roomDetails.getPrice() + ". <br> Czyli wzrosła. Słabo.";
         emailSender.sendMail(eweMail, title, text, true);
         emailSender.sendMail(adiMail, title, text, true);
     }
 
-    private void prepareAndSendNotificationForLowerPrice(int newPrice) throws MessagingException {
-        String eweMail = "ewe89@o2.pl";
-        String adiMail = "adi8912@poczta.fm";
-        String title = "Wycieczka TUI - zmiana ceny!";
+    private void prepareAndSendNotificationForLowerPrice(RoomDetails roomDetails) throws MessagingException {
+        String eweMail = roomDetails.getEmails().size() == 2 ? roomDetails.getEmails().get(0) : "ewe89@o2.pl";
+        String adiMail = roomDetails.getEmails().size() == 2 ? roomDetails.getEmails().get(1) : "adi8912@poczta.fm";
+        String title = "Wycieczka TUI - cena spadła!";
         String urlToOffer = "https://www.tui.pl/wypoczynek/turcja/riwiera-turecka/side-alegria-hotel-spa-ayt42014/OfferCodeWS/WROAYT20200606043020200606202006201640L14AYT42014DZX2AA02";
-        String text = "Cena wycieczki się zmieniła z " + INITIAL_PRICE + " na " + newPrice + ". <br> Wejdź na <a href=" + urlToOffer + ">Alegria Hotel TUI</a>, zrób screen i wyślij do TUI.";
+        String text = "Cena wycieczki się zmieniła z " + INITIAL_PRICE + " na " + roomDetails.getPrice() + ". <br> Wejdź na <a href=" + urlToOffer + ">Alegria Hotel TUI</a>, kliknij kup" +
+                " online (bez ubezpiecznia)," +
+                "wygeneruj pdf i wyślij do TUI.";
         emailSender.sendMail(eweMail, title, text, true);
         emailSender.sendMail(adiMail, title, text, true);
     }
