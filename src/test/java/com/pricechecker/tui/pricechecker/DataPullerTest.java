@@ -30,6 +30,7 @@ class DataPullerTest {
     void init() {
         EmailSender emailSender = new EmailSender(javaMailSender);
         dataPuller = new DataPuller(emailSender, roomDetailsService);
+        dataPuller.setInitialPrice(7322);
         when(roomDetailsService.save(any(RoomDetails.class))).thenReturn(new RoomDetails());
     }
 
@@ -52,7 +53,7 @@ class DataPullerTest {
         doNothing().when(javaMailSender).send(message);
         RoomDetails result = dataPuller.checkPriceAndEnrichResponse(responseWitHigherPrice);
 
-        assertEquals("Cena jest wyższa (stara 7322) niż podczas zakupu: 7590 z", result.getDetails());
+        assertEquals("Cena jest wyższa (stara 7322) niż podczas zakupu: 7590 zł", result.getDetails());
     }
 
     @Test

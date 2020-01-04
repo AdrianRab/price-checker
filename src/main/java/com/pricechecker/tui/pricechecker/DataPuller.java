@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataPuller {
     public static final String ROOM_CODE = "DZX2";
-    static int INITIAL_PRICE = 7322;
+    static int INITIAL_PRICE = 7212;
     private EmailSender emailSender;
     private RoomDetailsService roomDetailsService;
 
@@ -26,7 +26,6 @@ public class DataPuller {
         this.emailSender = emailSender;
         this.roomDetailsService = roomDetailsService;
     }
-
 
     RoomDetails checkPriceAndEnrichResponse(StringBuilder response) throws JsonProcessingException, MessagingException {
         RoomDetails roomDetails = RoomDetailsParser.parseJson(response.toString());
@@ -120,4 +119,9 @@ public class DataPuller {
         emailSender.sendMail(eweMail, title, text, true);
         emailSender.sendMail(adiMail, title, text, true);
     }
+
+    public static void setInitialPrice(int initialPrice) {
+        INITIAL_PRICE = initialPrice;
+    }
+
 }
