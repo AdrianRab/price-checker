@@ -1,0 +1,19 @@
+--CREATE SCHEMA IF NOT EXISTS price-checker
+
+--Drop table if exists room_details;
+--
+--create table room_details(
+--    id INT AUTO_INCREMENT  PRIMARY KEY,
+--    airportName VARCHAR(250),
+--    departureDate VARCHAR(250),
+--    returnDate VARCHAR(250),
+--    duration INT,
+--    roomName VARCHAR(250),
+--    roomCode VARCHAR(250),
+--    int price,
+--    int discountPrice
+--    offerCode VARCHAR(250),
+--    receivedOn Date,
+--    details VARCHAR(250),
+--    originalPrice int
+--)
