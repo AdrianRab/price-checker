@@ -1,4 +1,4 @@
-package com.pricechecker.tui.pricechecker;
+package com.pricechecker.tui.pricechecker.roomdetails;
 
 import java.io.Serializable;
 import java.util.ArrayList;

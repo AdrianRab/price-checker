@@ -2,7 +2,7 @@ package com.pricechecker.tui.pricechecker;
 import lombok.Data;
 
 @Data
-public class ResponseDetails {
+public class PostResponseDetails {
     private String airportName;
     private String departureDate;
     private String departureHours;

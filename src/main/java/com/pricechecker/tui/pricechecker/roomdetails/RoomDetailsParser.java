@@ -1,23 +1,28 @@
-package com.pricechecker.tui.pricechecker;
+package com.pricechecker.tui.pricechecker.roomdetails;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pricechecker.tui.pricechecker.PostResponseDetails;
+import com.pricechecker.tui.pricechecker.datapuller.DataPuller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class RoomDetailsParser {
 
     public static RoomDetails parseJson(String response) throws JsonProcessingException {
-        List<ResponseDetails> myRoomDetails = parseResponseAndGetOfferDetails(response);
+        List<PostResponseDetails> myRoomDetails = parseResponseAndGetOfferDetails(response);
         return getRoomDetails(myRoomDetails);
     }
 
-    private static RoomDetails getRoomDetails(List<ResponseDetails> myRoomDetails) {
+    private static RoomDetails getRoomDetails(List<PostResponseDetails> myRoomDetails) {
         if (myRoomDetails.isEmpty()) {
+            log.debug("Room {} is not available ", DataPuller.ROOM_CODE);
             throw new IllegalStateException("Your room" + DataPuller.ROOM_CODE + "is not available.");
         }
         return RoomDetails.builder()
@@ -36,17 +41,18 @@ public class RoomDetailsParser {
                 .build();
     }
 
-    private static List<ResponseDetails> parseResponseAndGetOfferDetails(String response) throws JsonProcessingException {
+    private static List<PostResponseDetails> parseResponseAndGetOfferDetails(String response) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode node = objectMapper.readTree(response);
         JsonNode offers = node.get("offers");
-        List<ResponseDetails> responseDetailsList = new ArrayList<>();
+        log.info("Parsing response to ResponseDetails object");
+        List<PostResponseDetails> postResponseDetailsList = new ArrayList<>();
         for (JsonNode offer : offers) {
-            ResponseDetails responseDetails = objectMapper.treeToValue(offer, ResponseDetails.class);
-            responseDetailsList.add(responseDetails);
+            PostResponseDetails postResponseDetails = objectMapper.treeToValue(offer, PostResponseDetails.class);
+            postResponseDetailsList.add(postResponseDetails);
         }
 
-        return responseDetailsList
+        return postResponseDetailsList
                 .stream()
                 .filter(respDetails -> respDetails.getRoomCode().equals(DataPuller.ROOM_CODE))
                 .collect(Collectors.toList());
