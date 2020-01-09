@@ -1,6 +1,5 @@
-package com.pricechecker.tui.pricechecker;
+package com.pricechecker.tui.pricechecker.roomdetails;
 
-import com.pricechecker.tui.pricechecker.RoomDetails;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

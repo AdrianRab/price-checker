@@ -1,11 +1,13 @@
-package com.pricechecker.tui.pricechecker;
+package com.pricechecker.tui.pricechecker.datapuller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.pricechecker.tui.pricechecker.EmailSender;
+import com.pricechecker.tui.pricechecker.roomdetails.RoomDetails;
+import com.pricechecker.tui.pricechecker.roomdetails.RoomDetailsService;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +33,6 @@ class DataPullerTest {
         EmailSender emailSender = new EmailSender(javaMailSender);
         dataPuller = new DataPuller(emailSender, roomDetailsService);
         dataPuller.setInitialPrice(7322);
-        when(roomDetailsService.save(any(RoomDetails.class))).thenReturn(new RoomDetails());
     }
 
     @Test
