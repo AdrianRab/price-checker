@@ -36,7 +36,7 @@ public class PriceCheckController {
 
     @Scheduled(fixedRate = 3600000)
     private RoomDetails runPriceCheck() throws IOException, MessagingException {
-        log.info("PRunning price check");
+        log.info("Running price check");
         URL tuiPrices = new URL("https://m.tui.pl/hotel-cards/configurators/all-offers");
         URL tuiOffer = new URL("https://www.tui.pl/hotel-cards/offers?offerCode=WROAYT20200606043020200606202006201640L14AYT42014DZX2AA02");
         String jsonInputForAllOffers = "{\"hotelCode\":\"AYT42014\",\"tripType\":\"WS\",\"adultsCount\":\"2\",\"childrenBirthdays\":[],\"airportCode\":\"WRO\",\"startDate\":\"2020-06-06\",\"durationFrom\":\"14\",\"durationTo\":\"14\",\"boardCode\":null,\"pagination\":{\"pageNo\":0,\"totalPages\":7,\"pageSize\":6,\"totalResults\":42},\"sort\":{\"field\":\"PRICE\",\"order\":\"ASCENDING\"}}";

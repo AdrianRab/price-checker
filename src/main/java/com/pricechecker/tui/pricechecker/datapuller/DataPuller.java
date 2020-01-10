@@ -36,8 +36,8 @@ public class DataPuller {
 
     public RoomDetails checkPriceAndEnrichResponse(StringBuilder response) throws JsonProcessingException, MessagingException {
         RoomDetails roomDetails = RoomDetailsParser.parseJson(response.toString());
-        roomDetailsService.saveToDbIfNoEntry(roomDetails);
         checkPriceAndSendNotification(roomDetails);
+        roomDetailsService.saveToDbIfNoEntry(roomDetails);
         return roomDetails;
     }
 
@@ -81,6 +81,7 @@ public class DataPuller {
             emailSender.prepareAndSendNotificationForHigherPrice(roomDetails, INITIAL_PRICE);
             roomDetails.setDetails("Cena jest wyższa (stara " + INITIAL_PRICE + ") niż podczas zakupu: " + newPrice + " zł");
         } else if (sortedPrices.contains(newPrice) || INITIAL_PRICE == newPrice){
+            log.info("Price is already saved in db, skipping e-mail sending");
             roomDetails.setDetails("Cena się nie zmieniła: " + newPrice + " zł");
         }
 
