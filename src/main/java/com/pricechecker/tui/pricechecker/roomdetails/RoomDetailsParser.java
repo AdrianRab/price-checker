@@ -3,7 +3,7 @@ package com.pricechecker.tui.pricechecker.roomdetails;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pricechecker.tui.pricechecker.PostResponseDetails;
+import com.pricechecker.tui.pricechecker.response.PostResponseDetails;
 import com.pricechecker.tui.pricechecker.datapuller.DataPuller;
 import java.util.ArrayList;
 import java.util.Arrays;
