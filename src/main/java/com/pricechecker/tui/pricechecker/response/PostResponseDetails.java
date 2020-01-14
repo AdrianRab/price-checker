@@ -1,4 +1,4 @@
-package com.pricechecker.tui.pricechecker;
+package com.pricechecker.tui.pricechecker.response;
 import lombok.Data;
 
 @Data
