@@ -51,7 +51,7 @@ public class PriceCheckController {
     @Scheduled(fixedRate = 3600000)
     private RoomDetails runPriceCheckGet() throws IOException, MessagingException {
         log.info("Running price check");
-        URL tuiOffer = new URL("https://www.tui.pl/hotel-cards/offers?offerCode=WROAYT20200606043020200606202006201640L14AYT42014DZX2AA02");
+        URL tuiOffer = new URL("https://www.tui.pl/hotel-cards/offers?offerCode=WROAYT20200606120020200606202006201640L14AYT42014DZX2AA02");
         StringBuilder pulledOfferData = dataPuller.connectAndPullDataGet(tuiOffer);
         return dataPuller.checkPriceAndConvertResponse(pulledOfferData);
     }
