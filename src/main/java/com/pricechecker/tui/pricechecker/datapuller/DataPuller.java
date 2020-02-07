@@ -23,7 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class DataPuller {
     public static final String ROOM_CODE = "DZX2";
-    public static int INITIAL_PRICE = 7028;
+    public static int INITIAL_PRICE = 7008;
     private EmailSender emailSender;
     private RoomDetailsService roomDetailsService;
     private final String GET = "GET";
