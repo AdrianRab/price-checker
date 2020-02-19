@@ -15,4 +15,5 @@ public class PostResponseDetails {
     private int price;
     private int discountPrice;
     private String offerCode;
+    private int pricePerPerson;
 }
